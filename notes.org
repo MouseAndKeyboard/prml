@@ -63,7 +63,6 @@ return org_table
 |   8.252647399902344 |    1.3254883289337158 |
 |   5.443666458129883 |   -0.8487205505371094 |
 |    0.93526691198349 |    0.3932029902935028 |
-
 ** Plot Training Data
 #+begin_src python :results file :var data=noisy_sin_data
 import jax.numpy as np
@@ -82,8 +81,39 @@ return "/tmp/polycurve.png"
 [[file:/tmp/polycurve.png]]
 
 ** Polynomial Fit
-#+begin_src python
+#+begin_src python :var data=noisy_sin_data
 import jax.numpy as np
 from jax import grad, jit, vmap
 from jax import random
+
+reshaped = np.array(data).T
+x = reshaped[0]
+y = reshaped[1]
+
+key = random.PRNGKey(0)
+M = 4 # order of the polynomial
+coefficients = random.normal(key, shape=(M,))
+
+def polynomial(x, weights):
+    total = 0
+    for w, j in enumerate(weights):
+        total += w * x**j
+    return total
+
+def sum_of_squared_error(weights, xs, targets):
+    E = 0
+    for x, t in zip(xs, targets):
+        E += (polynomial(x, weights) - t)**2
+    return 0.5 * E
+
+def rms_error(weights, xs, targets):
+    return (2 * sum_of_squared_error(weights, xs, targets) / len(targets))**0.5
+
+derivative_rms_e = grad(rms_error)
+
+return derivative_rms_e(coefficients, x, y)
+
 #+end_src
+
+#+RESULTS:
+| 0 | -5.8272953 | 2.9321308 | -8.089957 |
