@@ -2,24 +2,78 @@
 
 * Polynomial Curve Fitting
 ** Generate Training Data
-#+begin_src python :results file
+#+begin_src python
 import jax.numpy as np
 import math
+import pandas as pd
 import matplotlib.pyplot as plt
 from jax import grad, jit, vmap
 from jax import random
 
 N = 35
 
-key = random.PRNGKey(0)
-x = random.uniform(key, shape=(N,), minval=0.0, maxval=2 * math.pi)
+key = random.PRNGKey(1)
+x = random.uniform(key, shape=(N,), minval=0.0, maxval=4 * math.pi)
 y = np.sin(x)
-n = random.normal(key, shape=(N,))
-n = random.shuffle(key, n)
+n = random.normal(key, shape=(N,)) * 0.5
+n = random.permutation(key, n)
 noised = y + n
 
+frame = pd.DataFrame(np.dstack((x, noised)).reshape((35,2)), columns=["x", "y"])
+org_table = [list(frame)] + [None] + frame.values.tolist()
+return org_table
+#+end_src
+
+#+name: noisy_sin_data
+#+RESULTS:
+|                   x |                     y |
+|---------------------+-----------------------|
+|  11.475879669189453 |    -1.597508430480957 |
+|  6.0544023513793945 |   -1.0683200359344482 |
+|  7.8347039222717285 |    2.1716153621673584 |
+|  0.9656873941421509 |   0.10913783311843872 |
+|   6.815914154052734 |    0.5647212266921997 |
+|   2.872323751449585 |   0.26815491914749146 |
+|  12.446371078491211 | -0.061065562069416046 |
+|   5.127542018890381 |   -0.6834315657615662 |
+|   6.869856834411621 |   0.43729326128959656 |
+|   8.525101661682129 |    1.3303260803222656 |
+|  2.5789079666137695 |    1.2624040842056274 |
+|  0.0319589339196682 |   0.18925164639949799 |
+| 0.10950136184692383 |   -0.2545621693134308 |
+|    4.91976261138916 |   -1.3503535985946655 |
+|   5.243987083435059 |   -1.3171619176864624 |
+|  11.656121253967285 |   -1.8453506231307983 |
+|  2.9330132007598877 |   -0.9817088842391968 |
+|  10.846165657043457 |   -0.9356269240379333 |
+|  1.9595601558685303 |    0.9025525450706482 |
+|   4.657401084899902 |   -1.6968696117401123 |
+|  10.758939743041992 |  -0.29170089960098267 |
+|   9.932485580444336 |   -0.6238781809806824 |
+|  1.0209242105484009 |    0.7684662342071533 |
+|   6.304523468017578 |   -0.6951113343238831 |
+|   2.278595209121704 |    1.6909582614898682 |
+|  0.9543383121490479 |   -0.5848230719566345 |
+|  0.3390022814273834 |   0.16744600236415863 |
+| 0.21827168762683868 |    -0.505255937576294 |
+|   6.851820468902588 |   0.03283339738845825 |
+|  0.5803421139717102 |    1.0799428224563599 |
+|  12.173314094543457 |   -1.3466168642044067 |
+|  0.9753196835517883 |    1.0296516418457031 |
+|   8.252647399902344 |    1.3254883289337158 |
+|   5.443666458129883 |   -0.8487205505371094 |
+|    0.93526691198349 |    0.3932029902935028 |
+
+** Plot Training Data
+#+begin_src python :results file :var data=noisy_sin_data
+import jax.numpy as np
+import matplotlib.pyplot as plt
+
+reshaped = np.array(data).T
+
+x = reshaped[0]
+y = reshaped[1]
 plt.plot(x, y, 'o')
-plt.plot(x, noised, 'x')
 plt.savefig("/tmp/polycurve.png")
 return "/tmp/polycurve.png"
 #+end_src
@@ -27,9 +81,7 @@ return "/tmp/polycurve.png"
 #+RESULTS:
 [[file:/tmp/polycurve.png]]
 
-**
-
-
+** Polynomial Fit
 #+begin_src python
 import jax.numpy as np
 from jax import grad, jit, vmap
