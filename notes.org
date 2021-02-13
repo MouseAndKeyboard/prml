@@ -143,16 +143,12 @@ return org_table
 
 #+NAME: polynomial_coefficients
 #+RESULTS:
-|         coefficients |
-|----------------------|
-|  0.08086775988340378 |
-| -0.42275360226631165 |
-|  -0.4504547417163849 |
-|  -11.772818565368652 |
-|    -1.29520583152771 |
-|  -63.629783630371094 |
-|  -0.9332914352416992 |
-|  -7.5972747802734375 |
+|        coefficients |
+|---------------------|
+|  1.8160858154296875 |
+| -0.7906920313835144 |
+| -0.7429272532463074 |
+|  -0.774492621421814 |
 ** Evaluate the polynomial
 
 #+begin_src python :var coefs=polynomial_coefficients data=noisy_sin_data
@@ -189,4 +185,4 @@ return rms_error(coefs, x, y)
 #+end_src
 
 #+RESULTS:
-| 8.5974173e+27 |
+| 2.80316046 |
