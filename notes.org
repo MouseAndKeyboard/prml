@@ -1,1 +1,37 @@
 #+TITLE: Notes
+
+* Polynomial Curve Fitting
+** Generate Training Data
+#+begin_src python :results file
+import jax.numpy as np
+import math
+import matplotlib.pyplot as plt
+from jax import grad, jit, vmap
+from jax import random
+
+N = 35
+
+key = random.PRNGKey(0)
+x = random.uniform(key, shape=(N,), minval=0.0, maxval=2 * math.pi)
+y = np.sin(x)
+n = random.normal(key, shape=(N,))
+n = random.shuffle(key, n)
+noised = y + n
+
+plt.plot(x, y, 'o')
+plt.plot(x, noised, 'x')
+plt.savefig("/tmp/polycurve.png")
+return "/tmp/polycurve.png"
+#+end_src
+
+#+RESULTS:
+[[file:/tmp/polycurve.png]]
+
+**
+
+
+#+begin_src python
+import jax.numpy as np
+from jax import grad, jit, vmap
+from jax import random
+#+end_src
